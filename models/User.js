@@ -5,12 +5,18 @@ const userSchema = new Schema({
   password: String,
   username: String,
   handle: String,
-  bio: String,
+  bio: {
+    type: String,
+    default: ''
+  },
   profileImg: {
     type: String,
     default: 'https://react.semantic-ui.com/images/avatar/large/jenny.jpg'
   },
-  followers: Number,
+  followers: {
+    type: Number,
+    default: 0
+  },
   createdAt: String
 })
 
