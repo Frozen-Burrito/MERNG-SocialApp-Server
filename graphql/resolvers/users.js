@@ -4,6 +4,7 @@ const { UserInputError } = require('apollo-server');
 
 const { SECRET_KEY } = process.env.SECRET_KEY || require('../../config');
 const { validateRegisterInput, validateLoginInput } = require('../../util/validators');
+const { createHandle } = require('../../util/createHandle');
 const User = require('../../models/User');
 
 const generateToken = ( user ) => {
@@ -15,24 +16,40 @@ const generateToken = ( user ) => {
 }
 
 module.exports = {
+  Query: {
+    async getPopularUsers() {
+      try {
+        const popularUsers = await User.find();
+        return popularUsers;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+    async userProfile(_, { userId }) {
+      try {
+        const user = await User.findById(userId);
+        return user;
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
+  },
   Mutation: {
-    async login(_, { username, password }) {
-      const { errors, valid } = validateLoginInput(username, password);
-      const user = await User.findOne({ username });
+    async login(_, { email, password }) {
+      const { errors, valid } = validateLoginInput(email, password);
+      const user = await User.findOne({ email });
 
       if (!valid) {
         throw new UserInputError('Errors', { errors });
       }
 
       if (!user) {
-        errors.general = 'Username not found';
-        throw new UserInputError('User not found', { errors });
+        throw new UserInputError('Email is incorrect', { errors });
       }
 
       const match = await bcrypt.compare(password, user.password);
 
       if (!match) {
-        errors.general = 'Incorrect password';
         throw new UserInputError('Incorrect password', { errors });
       }
 
@@ -54,12 +71,12 @@ module.exports = {
       }
 
       // Make sure user doesn't already exist
-      const user = await User.findOne({ username });
+      const user = await User.findOne({ email });
 
       if (user) {
-        throw new UserInputError('Username is taken', {
+        throw new UserInputError('Email is already taken', {
           errors: {
-            username: 'This username is already taken'
+            username: 'Email is already linked to an account'
           }
         })
       }
@@ -67,10 +84,13 @@ module.exports = {
       // hash password and create auth token
       password = await bcrypt.hash(password, 12);
 
+      let handle = createHandle(username);
+
       const newUser = new User({
         email,
         username,
         password,
+        handle,
         createdAt: new Date().toISOString()
       });
 

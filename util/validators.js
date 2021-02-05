@@ -30,10 +30,15 @@ module.exports.validateRegisterInput = (
   }
 }
 
-module.exports.validateLoginInput = (username, password) => {
+module.exports.validateLoginInput = (email, password) => {
   const errors = {};
-  if (username.trim() === '') {
-    errors.username = 'Username must not be empty';
+  if (email.trim() === '') {
+    errors.email = 'Please enter an email address';
+  } else {
+    const regEx = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
+    if (!email.match(regEx)) {
+      errors.email = 'Email is not valid'
+    }
   }
 
   if (password === '') {

@@ -12,6 +12,7 @@ module.exports = (context) => {
     if (token) {
       try {
         const user = jwt.verify(token, SECRET_KEY);
+        console.log(user)
         return user;
       } catch (error) {
         throw new AuthenticationError('Invalid authentication token');

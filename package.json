@@ -1,6 +1,6 @@
 {
-  "name": "merng",
-  "version": "1.0.0",
+  "name": "Inst-Uh (Backend)",
+  "version": "0.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,8 +8,8 @@
     "dev": "nodemon index"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Frozen Burrito",
+  "license": "MIT",
   "dependencies": {
     "apollo-server": "^2.18.2",
     "bcryptjs": "^2.4.3",
