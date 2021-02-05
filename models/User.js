@@ -1,9 +1,16 @@
 const { model, Schema } = require('mongoose');
 
 const userSchema = new Schema({
-  username: String,
-  password: String,
   email: String,
+  password: String,
+  username: String,
+  handle: String,
+  bio: String,
+  profileImg: {
+    type: String,
+    default: 'https://react.semantic-ui.com/images/avatar/large/jenny.jpg'
+  },
+  followers: Number,
   createdAt: String
 })
 
