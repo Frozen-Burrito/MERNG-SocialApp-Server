@@ -1,6 +1,7 @@
 const { AuthenticationError, UserInputError } = require('apollo-server');
 
 const Post = require('../../models/Post');
+const Topic = require('../../models/Topic');
 const verifyAuth = require('../../util/verifyAuth');
 
 module.exports = {
@@ -9,6 +10,22 @@ module.exports = {
       try {
         const posts = await Post.find().sort({ createdAt: -1 });
         return posts;
+      } catch (error) {
+        throw new Error(error);
+      }
+    },
+
+    async getPostsByTopic(_, { topicId }) {
+      try {
+        await Topic.findById(topicId);
+
+        try {
+          const posts = await Post.find();
+          const postsInTopic = posts.filter(post => post.topicID == topicId);
+          return postsInTopic;
+        } catch (error) {
+          throw new Error(error);
+        }
       } catch (error) {
         throw new Error(error);
       }
@@ -30,17 +47,21 @@ module.exports = {
     }
   }, 
   Mutation: {
-    async createPost(_, { body }, context) {
+    async createPost(_, { body, topicID='' }, context) {
       const user = verifyAuth(context);
       
       if(body.trim() === '') {
         throw new Error('Post body must not be empty');
       }
 
+      const topic = topicID ? (await Topic.findById(topicID)).name : '';
+
       const newPost = new Post({
         author: user.id,
         username: user.username,
         body,
+        topicID,
+        topic,
         createdAt: new Date().toISOString()
       });
 

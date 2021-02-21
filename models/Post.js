@@ -3,7 +3,13 @@ const { model, Schema } = require('mongoose');
 const postSchema = new Schema({
   body: String,
   username: String,
-  createdAt: String,
+  
+  topicID: {
+    type: Schema.Types.ObjectId,
+    ref: 'Topic'
+  },
+  topic: String,
+
   comments: [
     {
       author: {
@@ -28,7 +34,9 @@ const postSchema = new Schema({
   author: {
     type: Schema.Types.ObjectId,
     ref: 'users'
-  }
+  },
+
+  createdAt: String
 })
 
 module.exports = model('Post', postSchema);

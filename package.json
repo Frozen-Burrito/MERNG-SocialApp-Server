@@ -1,6 +1,6 @@
 {
-  "name": "Inst-Uh (Backend)",
-  "version": "0.1.1",
+  "name": "inst-uh-server",
+  "version": "0.2.1",
   "description": "",
   "main": "index.js",
   "scripts": {
