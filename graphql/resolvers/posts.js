@@ -1,9 +1,9 @@
 const { AuthenticationError, UserInputError } = require('apollo-server');
 const verifyAuth = require('../../util/verifyAuth');
 
-const Post = require('../../models/Post');
-const Topic = require('../../models/Topic');
-const Bookmarks = require('../../models/BookmarkList');
+const { Post } = require('../../models');
+const { Topic } = require('../../models');
+const { BookmarkList } = require('../../models');
 
 module.exports = {
   Query: {
@@ -51,10 +51,10 @@ module.exports = {
       try {
         const { id } = verifyAuth(context);
 
-        let userBookmarks = await Bookmarks.findOne({ user: id });
+        let userBookmarks = await BookmarkList.findOne({ user: id });
 
         if (!userBookmarks) {
-          userBookmarks = new Bookmarks({
+          userBookmarks = new BookmarkList({
             user: id,
             list: []
           });
@@ -151,7 +151,7 @@ module.exports = {
         throw new Error('Post not found');
       }
 
-      const userBookmarks = await Bookmarks.findOne({ user: id });
+      const userBookmarks = await BookmarkList.findOne({ user: id });
 
       if (userBookmarks.list.find(bookmark => bookmark == postID)) {
         userBookmarks.list = userBookmarks.list.filter(bookmark => bookmark != postID);

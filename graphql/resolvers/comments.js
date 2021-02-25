@@ -1,7 +1,7 @@
 const { UserInputError, AuthenticationError } = require('apollo-server');
-
-const Post = require('../../models/Post');
 const verifyAuth = require('../../util/verifyAuth');
+
+const { Post } = require('../../models');
 
 module.exports = {
   Mutation: {
