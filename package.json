@@ -1,7 +1,7 @@
 {
   "name": "inst-uh-server",
-  "version": "0.2.1",
-  "description": "",
+  "version": "0.2.2",
+  "description": "Server for a social media app built using Express.js and GraphQL",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

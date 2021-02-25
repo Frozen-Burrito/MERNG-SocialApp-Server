@@ -33,6 +33,11 @@ module.exports = gql`
     username: String!
     createdAt: String!
   }
+  type Bookmarks {
+    id: ID!
+    user: ID!
+    list: [ID!]!
+  }
   type User {
     id: ID!
     email: String!
@@ -51,21 +56,28 @@ module.exports = gql`
     confirmPassword: String!
   }
   type Query {
-    getPosts: [Post]
-    getPostsByTopic(topicId: ID!): [Post]
+    getPosts: [Post]!
+    getPostsByTopic(topicId: ID!): [Post]!
     getPost(postId: ID!): Post
-    getTopics: [Topic]
+    getBookmarkedPosts: [Post!]!
+
+    getTopics: [Topic]!
+
     userProfile(userId: ID!): User
-    getPopularUsers: [User]
+    getPopularUsers: [User]!
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(email: String!, password: String!): User!
+
     createPost(body: String!, topicID: ID): Post!
     deletePost(postId: ID!): String!
     createComment(postId: ID!, body: String!): Post!
     deleteComment(postId: ID!, commentId: ID!): Post!
     likePost(postId: ID!): Post!
+
+    bookmarkPost(postID: ID!): Boolean
+
     createTopic(topicName: String!, description: String): Topic
   }
   type Subscription {

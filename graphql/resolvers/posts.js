@@ -1,8 +1,9 @@
 const { AuthenticationError, UserInputError } = require('apollo-server');
+const verifyAuth = require('../../util/verifyAuth');
 
 const Post = require('../../models/Post');
 const Topic = require('../../models/Topic');
-const verifyAuth = require('../../util/verifyAuth');
+const Bookmarks = require('../../models/BookmarkList');
 
 module.exports = {
   Query: {
@@ -43,6 +44,38 @@ module.exports = {
         
       } catch (error) {
         throw new Error(error);
+      }
+    },
+
+    async getBookmarkedPosts(_, {} ,context) {
+      try {
+        const { id } = verifyAuth(context);
+
+        let userBookmarks = await Bookmarks.findOne({ user: id });
+
+        if (!userBookmarks) {
+          userBookmarks = new Bookmarks({
+            user: id,
+            list: []
+          });
+          await userBookmarks.save();
+        }
+
+        let posts = [];
+
+        for (const id of userBookmarks.list) {
+          try {
+            const post = await Post.findById(id);
+            posts.push(post);
+          } catch (error) {
+            posts.push({ error: true, msg: 'Post not found' });
+            continue;
+          }
+        }
+        
+        return posts;
+      } catch (error) {
+        throw new Error('Failed to load bookmarks for the user');
       }
     }
   }, 
@@ -92,22 +125,42 @@ module.exports = {
       const { id, username } = verifyAuth(context);
 
       const post = await Post.findById(postId);
+
       if (post) {
         if (post.likes.find(like => like.author == id)) {
-          // Post already liked by the user
           post.likes = post.likes.filter(like => like.author != id);
         } else {
-          // Not liked yet by the user
           post.likes.push({
             author: id,
             username,
             createdAt: new Date().toISOString()
-          })
+          });
         }
 
         await post.save();
         return post;
       } else throw new UserInputError('Post not found');
+    },
+
+    async bookmarkPost(_, { postID }, context) {
+      const { id } = verifyAuth(context);
+
+      try {
+        await Post.findById(postID);
+      } catch (error) {
+        throw new Error('Post not found');
+      }
+
+      const userBookmarks = await Bookmarks.findOne({ user: id });
+
+      if (userBookmarks.list.find(bookmark => bookmark == postID)) {
+        userBookmarks.list = userBookmarks.list.filter(bookmark => bookmark != postID);
+      } else {
+        userBookmarks.list.push( postID );
+      }
+
+      await userBookmarks.save();
+      return userBookmarks.list.includes(postID);
     }
   },
   Subscription: {
